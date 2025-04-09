@@ -1,19 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>我的貓咪相簿</title>
+  <title>大家的貓咪相簿</title>
   <style>
-    body { font-family: sans-serif; text-align: center; }
+    body { font-family: sans-serif; text-align: center; padding: 20px; }
     .gallery img { width: 200px; margin: 10px; border-radius: 10px; }
+    input[type="file"] { margin-top: 20px; }
+    #status { color: green; margin: 10px; }
   </style>
 </head>
 <body>
-  <h1>🐱 歡迎來到貓咪相簿 🐱</h1>
-  <div class="gallery">
-    <img src="https://placekitten.com/300/200" alt="可愛貓咪1">
-    <img src="https://placekitten.com/301/200" alt="可愛貓咪2">
-    <img src="https://placekitten.com/302/200" alt="可愛貓咪3">
+  <h1>🐱 大家的貓咪相簿 🐱</h1>
+
+  <p>點下方按鈕上傳你家的貓咪照片吧！</p>
+  <input type="file" id="fileInput">
+  <div id="status"></div>
+
+  <div class="gallery" id="gallery">
+    <!-- 圖片會顯示在這裡 -->
   </div>
-  <p>這是由大家一起打造的貓咪相簿喔！</p>
+
+  <script>
+    const cloudName = 'dujxxzqw0';
+    const uploadPreset = 'cat_upload';
+    const fileInput = document.getElementById('fileInput');
+    const gallery = document.getElementById('gallery');
+    const status = document.getElementById('status');
+
+    // 上傳圖片到 Cloudinary
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      status.textContent = '上傳中...';
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', uploadPreset);
+
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await res.json();
+      const imageUrl = data.secure_url;
+
+      // 顯示圖片
+      const img = document.createElement('img');
+      img.src = imageUrl;
+      gallery.prepend(img);
+
+      status.textContent = '上傳成功！';
+    });
+  </script>
 </body>
 </html>
